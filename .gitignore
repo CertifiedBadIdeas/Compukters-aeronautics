@@ -1,0 +1,7 @@
+.gradle/
+.gradle-sandbox/
+.toolchain/
+build/
+run/
+.agents/tmp/
+workspace.properties
