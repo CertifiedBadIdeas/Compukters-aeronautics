@@ -73,7 +73,9 @@ control and the computer cold boots with its files retained. Dimension transfers
 ## Development
 
 The build uses the public Compukters SDK and produces Java 21 bytecode; Gradle requires JDK 25.
-Select a Compukters source checkout explicitly when this repository is not beside it:
+The default workspace layout is the `addons/aeronautics` submodule inside Compukters. Initialize it
+from the Compukters root with `git submodule update --init addons/aeronautics`. Select a Compukters
+source checkout explicitly when developing this repository elsewhere:
 
 ```sh
 ./gradlew-sandbox-dev-parallel-summary check -PcompuktersWorkspace=/path/to/Compukters
