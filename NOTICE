@@ -1,0 +1,9 @@
+Compukters: Aeronautics
+Copyright 2026 Vsevolod Petrov (lazyhat)
+
+Build helpers and test fixture utilities are adapted from the Apache-2.0 licensed
+Compukters and Orbitalis–Compukters development repositories. Their original
+copyright and license notices are retained in the corresponding source files.
+
+Simulated, Aeronautics, Sable, Create and their libraries are external dependencies.
+This addon does not bundle their implementation classes or assets.

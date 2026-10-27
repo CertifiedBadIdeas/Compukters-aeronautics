@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ru.lazyhat.compukters.integration.aeronautics.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["SwivelBearingMixin"],
+  "injectors": {"defaultRequire": 1}
+}
