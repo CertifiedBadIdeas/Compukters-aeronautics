@@ -33,7 +33,7 @@ internal object PeripheralNetworkGameTestFixtures {
         val player = player(helper, positions.first())
         val stack = player.mainHandItem
         val item = stack.item as PeripheralConfiguratorItem
-        item.use(helper.level, player, InteractionHand.MAIN_HAND)
+        item.selectMode(player.mainHandItem, 1)
         for (position in positions) {
             player.setPos(requireNotNull(PeripheralWorldPositions.project(helper.level, Vec3.atCenterOf(position))))
             val result = PeripheralConfiguratorServer.bind(player, InteractionHand.MAIN_HAND, position, Direction.WEST)
@@ -51,7 +51,7 @@ internal object PeripheralNetworkGameTestFixtures {
     ) {
         val player = player(helper, position)
         val item = player.mainHandItem.item as PeripheralConfiguratorItem
-        item.use(helper.level, player, InteractionHand.MAIN_HAND)
+        item.selectMode(player.mainHandItem, 1)
         player.setShiftKeyDown(true)
         try {
             val result = PeripheralConfiguratorServer.bind(player, InteractionHand.MAIN_HAND, position, Direction.WEST)
