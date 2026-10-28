@@ -72,4 +72,59 @@ object DockingGameTests {
                 helper.assertTrue(!endpoint!!.valid(), "Old endpoint silently acquired a replacement")
             }.thenSucceed()
     }
+
+    @JvmStatic
+    @GameTest(batch = "docking", template = "bastion/mobs/empty", templateNamespace = "minecraft", timeoutTicks = 80)
+    fun reloadedRetractedAssociationReleasesWithoutLosingFluid(helper: GameTestHelper) {
+        val first = BlockPos(2, 3, 2)
+        val second = BlockPos(6, 3, 2)
+        val state =
+            BuiltInRegistries.BLOCK
+                .get(ResourceLocation.parse("simulated:docking_connector"))
+                .defaultBlockState()
+                .setValue(BlockStateProperties.FACING, Direction.UP)
+        helper.setBlock(first, state)
+        helper.setBlock(second, state)
+        helper
+            .startSequence()
+            .thenExecuteAfter(2) {
+                val a = helper.getBlockEntity(first) as DockingConnectorBlockEntity
+                val b = helper.getBlockEntity(second) as DockingConnectorBlockEntity
+                // World reload retains reciprocal positions but not the native in-memory pair/state.
+                for ((self, peer) in listOf(a to b, b to a)) {
+                    val saved = self.saveWithFullMetadata(helper.level.registryAccess())
+                    saved.put(
+                        "OtherConnector",
+                        net.minecraft.nbt.NbtUtils
+                            .writeBlockPos(peer.blockPos),
+                    )
+                    saved.putFloat("Extension", 0f)
+                    saved.putFloat("Target", 0f)
+                    saved.putFloat("Feet", 1f)
+                    self.loadWithComponents(saved, helper.level.registryAccess())
+                    val water =
+                        dev.simulated_team.simulated.multiloader.tanks.CFluidType(
+                            net.minecraft.world.level.material.Fluids.WATER,
+                            net.minecraft.core.component.DataComponentPatch.EMPTY,
+                        )
+                    dev.simulated_team.simulated.multiloader.tanks.SingleTank.applyInsert(
+                        self.tank,
+                        water,
+                        dev.simulated_team.simulated.service.SimFluidService.INSTANCE
+                            .mbToLoaderUnits(650),
+                    )
+                    helper.assertTrue(self.hasOtherConnector() && self.isRetracted, "Reload fixture did not retain stale association")
+                }
+            }.thenWaitUntil {
+                for (pos in listOf(first, second)) {
+                    val endpoint = DockingEndpoint(helper.getBlockEntity(pos) as DockingConnectorBlockEntity) { true }
+                    val sample = endpoint.state()
+                    helper.assertTrue(
+                        !sample.connected && !sample.locked && sample.retracted,
+                        "Reloaded unpowered connector retained association after native pair was retired",
+                    )
+                    helper.assertTrue(endpoint.fluidState().amountMb == 650, "Native undocking lost retained fuel")
+                }
+            }.thenSucceed()
+    }
 }

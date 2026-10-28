@@ -125,6 +125,7 @@ tasks.register("verifyAddonJar") {
             check(zip.getEntry("compukters_aeronautics.mixins.json") != null)
             check(zip.getEntry("META-INF/LICENSE.md") != null && zip.getEntry("META-INF/NOTICE") != null)
             check(zip.getEntry("ru/lazyhat/compukters/integration/aeronautics/mixin/SwivelBearingMixin.class") != null)
+            check(zip.getEntry("ru/lazyhat/compukters/integration/aeronautics/mixin/DockingConnectorMixin.class") != null)
             check(zip.entries().asSequence().none { it.name.startsWith("net/minecraft/") || it.name.startsWith("dev/simulated_team/") })
         }
     }

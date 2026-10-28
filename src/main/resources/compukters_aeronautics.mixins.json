@@ -3,6 +3,6 @@
   "minVersion": "0.8",
   "package": "ru.lazyhat.compukters.integration.aeronautics.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["SwivelBearingMixin"],
+  "mixins": ["SwivelBearingMixin", "DockingConnectorMixin"],
   "injectors": {"defaultRequire": 1}
 }

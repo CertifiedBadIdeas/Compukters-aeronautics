@@ -102,3 +102,9 @@ control cleanup. No client worlds are changed by these server tests.
 
 `DockingConnector.fluidState()` reads its own 1000 mB finite buffer, including residual stock
 while disconnected. It never fills, drains or unlocks the native connector.
+
+Simulated 1.3.2 can restore a peer association into its initial unpowered state after world reload.
+For an unpowered, fully retracted connector, the integration completes the native undocking path
+so the stale association cannot block departure forever. Existing native pairs use their own
+cleanup; orphaned associations use the connector's native cleanup. Buffer fuel remains intact.
+Powered or still-extending connectors keep their normal native behavior.
