@@ -17,7 +17,9 @@ package ru.lazyhat.compukters.integration.aeronautics
 
 import aeronautics.AeronauticsAddonContract
 import aeronautics.AeronauticsCapabilityHandler
+import aeronautics.DockingState
 import aeronautics.ServoState
+import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlockEntity
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlockEntity
 import net.neoforged.fml.common.Mod
 import ru.lazyhat.compukters.api.addon.AddonCallResult
@@ -33,6 +35,7 @@ import ru.lazyhat.compukters.api.addon.minecraft.CompuktersLeasedPeripheralEndpo
 import ru.lazyhat.compukters.api.addon.minecraft.CompuktersPeripheralAccessException
 import ru.lazyhat.compukters.api.addon.minecraft.CompuktersPeripheralContract
 import ru.lazyhat.compukters.api.addon.minecraft.CompuktersPeripheralDevice
+import ru.lazyhat.compukters.api.addon.minecraft.CompuktersPeripheralEndpoint
 import ru.lazyhat.compukters.api.addon.minecraft.CompuktersPeripheralProvider
 import ru.lazyhat.compukters.lang.runtime.vm.HostFailureKind
 
@@ -43,19 +46,29 @@ class AeronauticsAddon {
             AeronauticsAddonContract.guestApi(AeronauticsAddon::class.java),
             CompuktersAddonHostFactory { AeronauticsAddonContract.host(ServoHost(it)) },
             CompuktersPeripheralProvider { contact ->
-                (
-                    if (contact.level.hasChunkAt(
-                            contact.position,
-                        )
-                    ) {
-                        contact.level.getBlockEntity(contact.position) as? SwivelBearingBlockEntity
-                    } else {
-                        null
+                if (!contact.level.hasChunkAt(contact.position)) {
+                    null
+                } else {
+                    when (val entity = contact.level.getBlockEntity(contact.position)) {
+                        is SwivelBearingBlockEntity -> {
+                            entity
+                                .takeUnless { it.isRemoved }
+                                ?.let { CompuktersPeripheralDevice(it.blockPos, "servo") }
+                        }
+
+                        is DockingConnectorBlockEntity -> {
+                            entity
+                                .takeUnless { it.isRemoved }
+                                ?.let { CompuktersPeripheralDevice(it.blockPos, "docking_connector") }
+                        }
+
+                        else -> {
+                            null
+                        }
                     }
-                )?.takeUnless { it.isRemoved }
-                    ?.let { CompuktersPeripheralDevice(it.blockPos, "servo") }
+                }
             },
-            listOf(ServoHost.contract),
+            listOf(ServoHost.contract, DockingEndpoint.contract),
         )
     }
 }
@@ -113,6 +126,15 @@ internal class ServoHost(
     private val computer: CompuktersComputerContext,
 ) : AeronauticsCapabilityHandler {
     private val endpoints = mutableSetOf<ServoEndpoint>()
+
+    override fun dockState(handle: Int): AddonCallResult<DockingState> {
+        check(computer.level.server.isSameThread)
+        return try {
+            addonCompleted(computer.peripheral(DockingEndpoint.contract, handle).state())
+        } catch (failure: CompuktersPeripheralAccessException) {
+            addonFailed(failure.kind, failure.message)
+        }
+    }
 
     override fun state(handle: Int): AddonCallResult<ServoState> =
         withServo(handle) { endpoint ->
@@ -231,6 +253,47 @@ internal class ServoHost(
                                     location.isReachable()
                             }
                         }
+                }
+            }
+    }
+}
+
+/** Observation only: acquiring a handle never powers or locks a connector. */
+internal class DockingEndpoint(
+    private val entity: DockingConnectorBlockEntity,
+    private val reachable: () -> Boolean,
+) : CompuktersPeripheralEndpoint {
+    override val identity: Any get() = entity
+
+    override fun valid(): Boolean {
+        val level = entity.level ?: return false
+        check(level.server?.isSameThread == true)
+        return !entity.isRemoved && level.hasChunkAt(entity.blockPos) &&
+            level.getBlockEntity(entity.blockPos) === entity && reachable()
+    }
+
+    fun state(): DockingState =
+        DockingState(
+            checkNotNull(entity.level).gameTime,
+            entity.hasOtherConnector(),
+            entity.isLocked,
+            entity.isExtended,
+            entity.isRetracted,
+        )
+
+    companion object {
+        val contract =
+            CompuktersPeripheralContract(
+                "aeronautics:docking_connector",
+                "docking_connector",
+                "aeronautics.docking.DockingConnector",
+            ) { location ->
+                if (!location.level.hasChunkAt(location.position)) {
+                    null
+                } else {
+                    (location.level.getBlockEntity(location.position) as? DockingConnectorBlockEntity)
+                        ?.takeUnless { it.isRemoved }
+                        ?.let { DockingEndpoint(it) { location.isReachable() } }
                 }
             }
     }

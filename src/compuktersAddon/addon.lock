@@ -1,4 +1,5 @@
 lock 2
+record aeronautics.docking.DockingState aeronautics.docking.DockingState{gameTick:I64,connected:BOOL,locked:BOOL,extended:BOOL,retracted:BOOL}
 record aeronautics.servo.ServoState aeronautics.servo.ServoState{gameTick:I64,angle:F64,targetAngle:F64,angularVelocity:F64,speed:F64,controlled:BOOL,settled:BOOL}
 operation aeronautics aeronautics 1 0 active aeronautics.servo.ServoBindings.awaitStopped fun(Int,Int):Boolean
 operation aeronautics aeronautics 1 1 active aeronautics.servo.ServoBindings.close fun(Int):Unit
@@ -6,3 +7,4 @@ operation aeronautics aeronautics 1 2 active aeronautics.servo.ServoBindings.mov
 operation aeronautics aeronautics 1 3 active aeronautics.servo.ServoBindings.rotateBy fun(Int,Double,Double):Unit
 operation aeronautics aeronautics 1 4 active aeronautics.servo.ServoBindings.state fun(Int):ServoState
 operation aeronautics aeronautics 1 5 active aeronautics.servo.ServoBindings.stop fun(Int):Unit
+operation aeronautics aeronautics 1 6 active aeronautics.docking.DockingBindings.dockState fun(Int):DockingState

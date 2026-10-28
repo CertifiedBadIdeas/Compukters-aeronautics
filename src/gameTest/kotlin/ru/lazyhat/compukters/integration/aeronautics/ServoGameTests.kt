@@ -400,5 +400,6 @@ object ServoGameTestRegistration {
     @JvmStatic @SubscribeEvent
     fun register(event: RegisterGameTestsEvent) {
         event.register(ServoGameTests::class.java)
+        event.register(DockingGameTests::class.java)
     }
 }

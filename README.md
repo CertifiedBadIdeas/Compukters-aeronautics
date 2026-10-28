@@ -70,6 +70,14 @@ native cog may immediately resume normal rotation after release. To hold the tar
 running. Saved execution with an acquired servo is currently unsupported: unload/reload releases
 control and the computer cold boots with its files retained. Dimension transfers are outside this version.
 
+## Docking observations (API 1.1)
+
+`aeronautics.docking.DockingConnector.named("fuel-port").state()` reads the native server tick,
+`connected`, `locked`, `extended` and `retracted`. Bind ordinary Simulated docking connectors with
+normal peripheral tools. The API never supplies redstone, locks a port or transfers fluid itself.
+Native locked connectors physically fix their bodies; release them and wait for retraction before
+commanding flight. A stale or replaced connector fails the exact-device handle contract.
+
 ## Development
 
 The build uses the public Compukters SDK and produces Java 21 bytecode; Gradle requires JDK 25.
