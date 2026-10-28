@@ -17,6 +17,7 @@ package ru.lazyhat.compukters.integration.aeronautics
 
 import aeronautics.AeronauticsAddonContract
 import aeronautics.AeronauticsCapabilityHandler
+import aeronautics.DockingFluidState
 import aeronautics.DockingState
 import aeronautics.ServoState
 import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlockEntity
@@ -126,6 +127,15 @@ internal class ServoHost(
     private val computer: CompuktersComputerContext,
 ) : AeronauticsCapabilityHandler {
     private val endpoints = mutableSetOf<ServoEndpoint>()
+
+    override fun dockFluidState(handle: Int): AddonCallResult<DockingFluidState> {
+        check(computer.level.server.isSameThread)
+        return try {
+            addonCompleted(computer.peripheral(DockingEndpoint.contract, handle).fluidState())
+        } catch (failure: CompuktersPeripheralAccessException) {
+            addonFailed(failure.kind, failure.message)
+        }
+    }
 
     override fun dockState(handle: Int): AddonCallResult<DockingState> {
         check(computer.level.server.isSameThread)
@@ -270,6 +280,27 @@ internal class DockingEndpoint(
         check(level.server?.isSameThread == true)
         return !entity.isRemoved && level.hasChunkAt(entity.blockPos) &&
             level.getBlockEntity(entity.blockPos) === entity && reachable()
+    }
+
+    fun fluidState(): DockingFluidState {
+        val tank = entity.tank
+        val scale =
+            dev.simulated_team.simulated.service.SimFluidService.INSTANCE
+                .mbToLoaderUnits(1)
+        return DockingFluidState(
+            checkNotNull(entity.level).gameTime,
+            if (tank.amount == 0L ||
+                tank.type.isBlank
+            ) {
+                ""
+            } else {
+                net.minecraft.core.registries.BuiltInRegistries.FLUID
+                    .getKey(tank.type.fluid())
+                    .toString()
+            },
+            (tank.amount / scale).toInt(),
+            (tank.capacity / scale).toInt(),
+        )
     }
 
     fun state(): DockingState =

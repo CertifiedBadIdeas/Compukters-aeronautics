@@ -37,6 +37,27 @@ object DockingGameTests {
                 val sample = endpoint!!.state()
                 helper.assertTrue(sample.gameTick == helper.level.gameTime, "Wrong native observation tick")
                 helper.assertTrue(!sample.connected && !sample.locked && sample.retracted, "Read-only acquisition changed native dock")
+                val empty = endpoint!!.fluidState()
+                helper.assertTrue(
+                    empty.fluid == "" && empty.amountMb == 0 && empty.capacityMb == 1000,
+                    "Wrong native connector buffer capacity",
+                )
+                val water =
+                    dev.simulated_team.simulated.multiloader.tanks.CFluidType(
+                        net.minecraft.world.level.material.Fluids.WATER,
+                        net.minecraft.core.component.DataComponentPatch.EMPTY,
+                    )
+                dev.simulated_team.simulated.multiloader.tanks.SingleTank.applyInsert(
+                    entity.tank,
+                    water,
+                    dev.simulated_team.simulated.service.SimFluidService.INSTANCE
+                        .mbToLoaderUnits(650),
+                )
+                val retained = endpoint!!.fluidState()
+                helper.assertTrue(
+                    retained.gameTick == helper.level.gameTime && retained.fluid == "minecraft:water" && retained.amountMb == 650,
+                    "Disconnected native stock was omitted or mutated",
+                )
                 helper.setBlock(pos.below(), Blocks.REDSTONE_BLOCK)
             }.thenWaitUntil {
                 helper.assertTrue(endpoint!!.state().extended, "Native redstone did not extend connector")

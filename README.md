@@ -99,3 +99,6 @@ Behavioral unit tests cover angle unwrapping, signed multi-turn goals, speed/way
 retargeting, stopping, invalid input and measured settling. Real GameTests exercise native bearing
 assembly and Sable motion, a moving physical parent and a compiled Guest program with timeout and
 control cleanup. No client worlds are changed by these server tests.
+
+`DockingConnector.fluidState()` reads its own 1000 mB finite buffer, including residual stock
+while disconnected. It never fills, drains or unlocks the native connector.
