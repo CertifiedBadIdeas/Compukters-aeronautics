@@ -68,7 +68,9 @@ bearing concurrently. `close()`, program exit/termination and observed network l
 travel, capture the current actual angle and return control to native kinetics/redstone. A powered
 native cog may immediately resume normal rotation after release. To hold the target, keep the program
 running. Saved execution with an acquired servo is currently unsupported: unload/reload releases
-control and the computer cold boots with its files retained. Dimension transfers are outside this version.
+control and the computer cold boots with its files retained. An unused host, or one whose observed servo
+handles have all been closed, supports an empty checkpoint so installing Aeronautics does not interrupt
+unrelated programs during unload or ship transfer. Transferring an active servo remains unsupported.
 
 ## Docking observations (API 1.1)
 

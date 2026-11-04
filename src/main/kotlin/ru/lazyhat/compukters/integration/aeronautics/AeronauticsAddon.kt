@@ -224,6 +224,16 @@ internal class ServoHost(
             addonCompleted(Unit)
         }
 
+    override fun checkpoint(): ByteArray {
+        check(endpoints.isEmpty()) { "Active Aeronautics servo resources do not support hibernation" }
+        return byteArrayOf()
+    }
+
+    override fun restoreCheckpoint(state: ByteArray) {
+        require(state.isEmpty()) { "Aeronautics servo resources do not support restoration" }
+        reset()
+    }
+
     override fun reset() {
         endpoints.forEach { it.release() }
         endpoints.clear()
