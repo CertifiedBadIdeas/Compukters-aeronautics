@@ -195,7 +195,7 @@ object ServoGameTests {
                 check(observation.angularVelocity >= -1.0 && observation.angularVelocity <= 1.0)
                 println("servo-rotated")
                 readln()
-                servo.rotateBy(720.0)
+                servo.rotateBy(720.0, 90.0)
                 check(!servo.awaitStopped(10))
                 servo.stop()
                 check(servo.awaitStopped(200))
@@ -206,7 +206,7 @@ object ServoGameTests {
                 println("servo-closed")
                 readln()
                 val next = Servo.named("arm")
-                next.rotateBy(720.0)
+                next.rotateBy(720.0, 90.0)
                 println("servo-running")
                 readln()
                 var disconnected = false
@@ -215,7 +215,7 @@ object ServoGameTests {
                 println("servo-disconnected")
                 readln()
                 val restored = Servo.named("arm")
-                restored.rotateBy(720.0)
+                restored.rotateBy(720.0, 90.0)
                 println("servo-reconnected")
                 readln()
             }

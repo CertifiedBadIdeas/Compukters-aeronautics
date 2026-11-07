@@ -110,3 +110,16 @@ For an unpowered, fully retracted connector, the integration completes the nativ
 so the stale association cannot block departure forever. Existing native pairs use their own
 cleanup; orphaned associations use the connector's native cleanup. Buffer fuel remains intact.
 Powered or still-extending connectors keep their normal native behavior.
+
+## Declarative Guest contracts
+
+Guest API declarations live in `src/compuktersAddon/contracts`. The SDK generates the actual Guest Kotlin under
+`build/generated/sources/compuktersGuest/kotlin` and packages those sources with the executable `.cagb` image.
+Run `generateCompuktersGuestSources` to inspect the result. Check in `src/compuktersAddon/addon.lock` as ABI history;
+only `updateCompuktersAddonAbiLock` changes selectors/tombstones after an intentional contract edit.
+Unit-returning `@GuestCommand` methods get ordinary calls and batch command factories from the same declaration.
+The generated host validates declared parameter constraints and derives command eligibility.
+See the [SDK authoring guide](https://github.com/CertifiedBadIdeas/Compukters/blob/dev/docs/developers/addon-development.md).
+
+API 2.0 requires explicit speed in `moveTo(degrees, speed)` and `rotateBy(degrees, speed)`, and an explicit timeout
+in `awaitStopped(timeoutTicks)`. The former convenience overloads/defaults are no longer author-maintained Guest code.
