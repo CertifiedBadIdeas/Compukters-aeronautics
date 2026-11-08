@@ -5,11 +5,9 @@
 package aeronautics.docking
 
 import ru.lazyhat.compukters.api.contracts.GuestDevice
-import ru.lazyhat.compukters.api.contracts.GuestRead
-import ru.lazyhat.compukters.api.contracts.GuestRecord
+import ru.lazyhat.compukters.api.contracts.GuestCall
 
 /** Native docking observations. Redstone controls extension and locking; locked ports fix both bodies. */
-@GuestRecord
 value class DockingState(
     val gameTick: Long,
     val connected: Boolean,
@@ -19,7 +17,6 @@ value class DockingState(
 )
 
 /** The connector's own finite buffer, including stock retained while disconnected. */
-@GuestRecord
 value class DockingFluidState(
     val gameTick: Long,
     val fluid: String,
@@ -29,9 +26,9 @@ value class DockingFluidState(
 
 @GuestDevice("aeronautics:docking_connector", bindings = "DockingBindings")
 interface DockingConnector {
-    @GuestRead(binding = "dockState")
+    @GuestCall(binding = "dockState")
     fun state(): DockingState
 
-    @GuestRead(binding = "dockFluidState")
+    @GuestCall(binding = "dockFluidState")
     fun fluidState(): DockingFluidState
 }

@@ -119,7 +119,9 @@ records use native `value class` declarations to retain inline representation. T
 `build/generated/sources/compuktersGuest/kotlin` and packages those sources with the executable `.cagb` image.
 Run `generateCompuktersGuestSources` to inspect the result. Check in `src/contract/addon.lock` as ABI history;
 only `updateCompuktersAddonAbiLock` changes selectors/tombstones after an intentional contract edit.
-Unit-returning `@GuestCommand` methods get ordinary calls and batch command factories from the same declaration.
+Every immediate `@GuestCall` gets an ordinary method and a typed batch command factory; `@GuestWait` may wait and is excluded.
+Boundary records are inferred from signatures without an annotation. Batch results support iteration and typed lookup by command identity.
+SDK 0.9 uses command ABI 2; older batch programs must be recompiled.
 The generated host validates declared parameter constraints and derives command eligibility.
 See the [SDK authoring guide](https://github.com/CertifiedBadIdeas/Compukters/blob/dev/docs/developers/addon-development.md).
 

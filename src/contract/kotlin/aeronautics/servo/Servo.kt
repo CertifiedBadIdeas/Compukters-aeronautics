@@ -17,15 +17,11 @@ package aeronautics.servo
 
 import ru.lazyhat.compukters.api.contracts.DoubleRange
 import ru.lazyhat.compukters.api.contracts.GuestCall
-import ru.lazyhat.compukters.api.contracts.GuestCommand
 import ru.lazyhat.compukters.api.contracts.GuestDevice
-import ru.lazyhat.compukters.api.contracts.GuestRead
-import ru.lazyhat.compukters.api.contracts.GuestRecord
 import ru.lazyhat.compukters.api.contracts.GuestWait
 import ru.lazyhat.compukters.api.contracts.IntRange
 
 /** Angles are unwrapped degrees about the outward bearing axis, relative to its physical base. */
-@GuestRecord
 value class ServoState(
     val gameTick: Long,
     val angle: Double,
@@ -38,23 +34,23 @@ value class ServoState(
 
 @GuestDevice("aeronautics:servo", bindings = "ServoBindings")
 interface Servo {
-    @GuestRead(binding = "state")
+    @GuestCall(binding = "state")
     fun state(): ServoState
 
-    @GuestCommand(binding = "moveTo")
+    @GuestCall(binding = "moveTo")
     fun moveTo(
         @DoubleRange(min = -360000.0, max = 360000.0) degrees: Double,
         @DoubleRange(min = 0.1, max = 360.0) speed: Double,
     ): Unit
 
-    @GuestCommand(binding = "rotateBy")
+    @GuestCall(binding = "rotateBy")
     fun rotateBy(
         @DoubleRange(min = -360000.0, max = 360000.0) degrees: Double,
         @DoubleRange(min = 0.1, max = 360.0) speed: Double,
     ): Unit
 
     /** Cancel travel and hold the current actual angle. Braking takes physical time. */
-    @GuestCommand(binding = "stop")
+    @GuestCall(binding = "stop")
     fun stop(): Unit
 
     /** True only after actual position and speed settle; false on timeout. The motion continues on timeout. */
