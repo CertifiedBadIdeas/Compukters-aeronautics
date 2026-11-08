@@ -26,7 +26,7 @@ import ru.lazyhat.compukters.api.contracts.IntRange
 
 /** Angles are unwrapped degrees about the outward bearing axis, relative to its physical base. */
 @GuestRecord
-data class ServoState(
+value class ServoState(
     val gameTick: Long,
     val angle: Double,
     val targetAngle: Double,

@@ -10,7 +10,7 @@ import ru.lazyhat.compukters.api.contracts.GuestRecord
 
 /** Native docking observations. Redstone controls extension and locking; locked ports fix both bodies. */
 @GuestRecord
-data class DockingState(
+value class DockingState(
     val gameTick: Long,
     val connected: Boolean,
     val locked: Boolean,
@@ -20,7 +20,7 @@ data class DockingState(
 
 /** The connector's own finite buffer, including stock retained while disconnected. */
 @GuestRecord
-data class DockingFluidState(
+value class DockingFluidState(
     val gameTick: Long,
     val fluid: String,
     val amountMb: Int,
